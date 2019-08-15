@@ -69,7 +69,6 @@ public class ZeroMQConnection implements Connection{
 
             while (!Thread.currentThread().isInterrupted() && working){
                 data = sub.recvStr().replace(topic,"");
-                System.out.println(consumers);
                 consumers.forEach(c->c.accept(data));
             }
         }

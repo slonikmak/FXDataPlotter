@@ -4,12 +4,15 @@ package com.oceanos.fxdataplotter.model;
  * @autor slonikmak on 12.08.2019.
  */
 public class DataField {
+
+    private String oldName;
     private String name;
     private int position;
     private Double value;
 
     public DataField(String name, int position){
         this.name = name;
+        this.oldName = name;
         this.position = position;
     }
 
@@ -31,5 +34,9 @@ public class DataField {
 
     public void setValue(Double value) {
         this.value = value;
+    }
+
+    public String getOldName(){
+        return oldName;
     }
 }

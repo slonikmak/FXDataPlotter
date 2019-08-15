@@ -41,7 +41,16 @@ public class DataSource {
             sampleDataProperty().setValue(s);
             try {
                 Map<DataField, Double> values = getValues(s);
-                getFields().forEach(f->f.setValue(values.get(f)));
+                getFields().forEach(f->{
+                    f.setValue(values.get(f));
+                   /* System.out.println("f "+f.getName());
+                    System.out.println(values.get(f));*/
+                });
+               /* StringBuilder stringBuilder = new StringBuilder();
+                values.keySet().forEach(k->stringBuilder.append(k.getName()).append(": ").append(values.get(k)).append(", "));
+                System.out.println(stringBuilder.toString());*/
+
+
             } catch (DataParseException e) {
                 e.printStackTrace();
             }

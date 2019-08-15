@@ -46,7 +46,7 @@ public class JSONAdapter implements DataAdapter{
         Map<DataField, Double> valsMap = new HashMap<>();
         try {
             Map<String, Object> result = mapper.readValue(dataString, Map.class);
-            fields.forEach(f->valsMap.put(f, (Double)result.get(f.getName())));
+            fields.forEach(f->valsMap.put(f, (Double)result.get(f.getOldName())));
 
         } catch (IOException e) {
             throw new DataParseException(e.getMessage());

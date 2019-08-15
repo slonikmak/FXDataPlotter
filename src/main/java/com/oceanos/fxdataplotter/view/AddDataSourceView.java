@@ -90,8 +90,8 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
     @FXML
     void add(ActionEvent event) {
         repository.addDataSourceViewModel(new DataSourceViewModel(dataSource, dataFieldViewModels));
-       dataSource.setName(nameField.getText());
-       stage.close();
+        dataSource.setName(nameField.getText());
+        stage.close();
     }
 
     @FXML
@@ -206,7 +206,7 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
         TableColumn<DataFieldViewModel, Color> colorColumn = new TableColumn<>("Цвет");
         colorColumn.setPrefWidth(90);
         colorColumn.setCellValueFactory(new PropertyValueFactory<>("color"));
-        colorColumn.setCellFactory(param ->{
+        colorColumn.setCellFactory(param -> {
             EditColorPickerCell<DataFieldViewModel> cell = new EditColorPickerCell<>(colorColumn);
             cell.setAlignment(Pos.CENTER);
             return cell;
@@ -238,7 +238,7 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
 
     }
 
-    public void setStage(Stage stage){
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 }
