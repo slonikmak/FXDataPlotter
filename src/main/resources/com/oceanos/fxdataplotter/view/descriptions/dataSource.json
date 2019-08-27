@@ -1,0 +1,56 @@
+ [
+    {
+      "dataSource" : {
+        "name" : "Sample",
+        "sampleData" : "{\"val1\":0.24688794277655401,\"val2\":1.2320965135243211,\"val3\":2.1957007190917577}",
+        "connection": {
+          "type": "zeroMQ",
+          "host": "localhost",
+          "port": 8000,
+          "topic": "topic/"
+        },
+        "dataAdapter": "JSON"
+      },
+
+      "dataFieldViewModels" : [ {
+        "min" : -5.0,
+        "max" : 1.0,
+        "name" : "val1",
+        "oldName" : "val1",
+        "position" : 0,
+        "enabled" : true,
+        "color" : {
+          "red" : 1.0,
+          "green" : 0.5,
+          "blue" : 0.0,
+          "opacity" : 1.0
+        }
+      }, {
+        "min" : 0.0,
+        "max" : 1.0,
+        "name" : "val2",
+        "oldName" : "val2",
+        "position" : 1,
+        "enabled" : true,
+        "color" : {
+          "red" : 1.0,
+          "green" : 0.0,
+          "blue" : 0.0,
+          "opacity" : 1.0
+        }
+      }, {
+        "min" : 0.0,
+        "max" : 1.0,
+        "name" : "val3",
+        "oldName" : "val3",
+        "position" : 2,
+        "enabled" : true,
+        "color" : {
+          "red" : 1.0,
+          "green" : 0.5,
+          "blue" : 0.5,
+          "opacity" : 1.0
+        }
+      } ]
+    }
+  ]

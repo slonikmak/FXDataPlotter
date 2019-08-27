@@ -17,6 +17,7 @@ import java.util.List;
 public class Main extends MvvmfxGuiceApplication {
 
     private MainViewModel mainViewModel;
+    private MainView mainView;
 
     public static void main(String[] args) {
         launch(args);
@@ -33,7 +34,7 @@ public class Main extends MvvmfxGuiceApplication {
         final ViewTuple<MainView, MainViewModel> tuple = FluentViewLoader.fxmlView(MainView.class).load();
 
         mainViewModel = tuple.getViewModel();
-
+        mainView = tuple.getCodeBehind();
         final Parent view = tuple.getView();
 
         final Scene scene = new Scene(view);
@@ -44,6 +45,7 @@ public class Main extends MvvmfxGuiceApplication {
     @Override
     public void stopMvvmfx() throws Exception {
         mainViewModel.stop();
+        mainView.stop();
     }
 
     @Override

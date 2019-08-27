@@ -18,44 +18,41 @@ public class DataSource {
     private Connection connection;
     private DataAdapter dataAdapter;
     private String name;
-    private StringProperty sampleData = new SimpleStringProperty();
+    private SimpleStringProperty sampleData = new SimpleStringProperty();
 
 
     public DataSource(Connection connection, DataAdapter dataAdapter) {
         this.connection = connection;
         this.dataAdapter = dataAdapter;
-        init();
+        //init();
     }
 
-    private void init(){
+    public void init(){
         connection.getSampleData().thenAccept(data->{
             try {
                 dataAdapter.init(data);
-                sampleData.setValue(data);
+                sampleData.set(data);
             } catch (DataParseException e) {
                 e.printStackTrace();
             }
         });
 
+    }
+
+    public void start(){
         connection.setOnReceived(s->{
-            sampleDataProperty().setValue(s);
+            sampleData.set(s);
             try {
                 Map<DataField, Double> values = getValues(s);
                 getFields().forEach(f->{
                     f.setValue(values.get(f));
-                   /* System.out.println("f "+f.getName());
-                    System.out.println(values.get(f));*/
-                });
-               /* StringBuilder stringBuilder = new StringBuilder();
-                values.keySet().forEach(k->stringBuilder.append(k.getName()).append(": ").append(values.get(k)).append(", "));
-                System.out.println(stringBuilder.toString());*/
 
+                });
 
             } catch (DataParseException e) {
                 e.printStackTrace();
             }
         });
-
     }
 
     public String getName() {
@@ -85,4 +82,6 @@ public class DataSource {
     public void stop(){
         connection.close();
     }
+
+
 }

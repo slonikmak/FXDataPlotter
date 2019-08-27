@@ -39,4 +39,8 @@ public class DataField {
     public String getOldName(){
         return oldName;
     }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
+    }
 }

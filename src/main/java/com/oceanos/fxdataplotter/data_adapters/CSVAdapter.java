@@ -42,6 +42,11 @@ public class CSVAdapter implements DataAdapter{
         return valsMap;
     }
 
+    @Override
+    public void setFields(List<DataField> fields) {
+
+    }
+
     public void setDelimiter(String delemiter){
         this.delimiter = delemiter;
     }

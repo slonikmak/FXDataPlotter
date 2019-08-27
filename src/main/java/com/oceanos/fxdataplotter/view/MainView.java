@@ -1,9 +1,18 @@
 package com.oceanos.fxdataplotter.view;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.oceanos.fxdataplotter.chartview.ChartView;
+import com.oceanos.fxdataplotter.chartview.DataFieldViewModel;
+import com.oceanos.fxdataplotter.connections.Connection;
+import com.oceanos.fxdataplotter.connections.ZeroMQConnection;
+import com.oceanos.fxdataplotter.data_adapters.DataAdapter;
+import com.oceanos.fxdataplotter.data_adapters.JSONAdapter;
 import com.oceanos.fxdataplotter.data_source.DataSource;
 import com.oceanos.fxdataplotter.logger.DataLogger;
+import com.oceanos.fxdataplotter.model.DataField;
 import com.oceanos.fxdataplotter.preference.AppPreference;
 import com.oceanos.fxdataplotter.viewmodel.AddDataSourceViewModel;
 import com.oceanos.fxdataplotter.chartview.DataSourceViewModel;
@@ -13,6 +22,9 @@ import de.saxsys.mvvmfx.FxmlView;
 import de.saxsys.mvvmfx.InjectViewModel;
 import de.saxsys.mvvmfx.ViewTuple;
 import javafx.beans.InvalidationListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -22,6 +34,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -31,9 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +89,12 @@ public class MainView implements FxmlView<MainViewModel> {
     private TextField delimiterField;
 
     @FXML
+    private TextField logDescription;
+
+    @FXML
+    private AnchorPane dataFieldsPane;
+
+    @FXML
     private void startLogging(ActionEvent event){
 
         setDefaultLogFileName();
@@ -86,7 +103,7 @@ public class MainView implements FxmlView<MainViewModel> {
         dataLogger = new DataLogger();
         List<DataSource> dataSources = viewModel.getRepository().getDataSources().stream().map(DataSourceViewModel::getDataSource).collect(Collectors.toList());
         try {
-            dataLogger.startLogging(dataSources, logFolderField.getText(),fileName.getText(), delimiterField.getText());
+            dataLogger.startLogging(dataSources, logFolderField.getText(),fileName.getText()+"_"+logDescription.getText(), delimiterField.getText());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,6 +118,7 @@ public class MainView implements FxmlView<MainViewModel> {
                 e.printStackTrace();
             }
         }
+        System.out.println("Stop logging");
     }
 
     @FXML
@@ -134,7 +152,15 @@ public class MainView implements FxmlView<MainViewModel> {
     @FXML
     void startPlotting(ActionEvent event) {
 
-        chartView = new ChartView("Данные ЛИ АНПА");
+        if (chartView!=null) {
+            try {
+                chartView.stopPlotting();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        chartView = new ChartView("ЛИ АНПА");
 
         viewModel.getRepository().getDataSources().forEach(d->chartView.addDataSource(d));
 
@@ -147,6 +173,89 @@ public class MainView implements FxmlView<MainViewModel> {
         AnchorPane.setLeftAnchor(chartView, 0.);
         AnchorPane.setRightAnchor(chartView, 0.);
 
+        chartView.startPlotting();
+    }
+
+    @FXML
+    void fillDefaultDataSource(ActionEvent e){
+
+        //TODO: deep refactor
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode root = mapper.readTree(getClass().getResource("/com/oceanos/fxdataplotter/view/descriptions/dataSource.json"));
+            root.elements().forEachRemaining(dataSourceNodeElem-> {
+
+                JsonNode dataSourceNode = dataSourceNodeElem.get("dataSource");
+                String dataSourceName = dataSourceNode.get("name").asText();
+                String sampleData = dataSourceNode.get("sampleData").asText();
+                JsonNode connectionNode = dataSourceNode.get("connection");
+                String connectionType = connectionNode.get("type").asText();
+
+                Connection connection = null;
+
+                if (connectionType.equals("zeroMQ")){
+                    String host = connectionNode.get("host").asText();
+                    int port = connectionNode.get("port").asInt();
+                    String topic = connectionNode.get("topic").asText();
+                    connection = new ZeroMQConnection("tcp://"+host+":"+port, topic);
+                }
+                DataAdapter adapter = null;
+                String dataAdapterType = dataSourceNode.get("dataAdapter").asText();
+                if (dataAdapterType.equals("JSON")){
+                    adapter = new JSONAdapter();
+                }
+                ObservableList<DataFieldViewModel> dataFieldViewModels = FXCollections.observableArrayList();
+                List<DataField> dataFields = new ArrayList<>();
+
+                JsonNode dataFieldsNode = dataSourceNodeElem.get("dataFieldViewModels");
+
+
+                dataFieldsNode.elements().forEachRemaining(dataFieldNode->{
+
+                    String dataFieldName = dataFieldNode.get("name").asText();
+                    String dataFieldOldName = dataFieldNode.get("oldName").asText();
+                    int dataFieldPosition = dataFieldNode.get("position").asInt();
+                    double min = dataFieldNode.get("min").asDouble(0.);
+                    double max = dataFieldNode.get("max").asDouble(0.);
+                    boolean enabled = dataFieldNode.get("enabled").asBoolean();
+
+                    JsonNode colorNode = dataFieldNode.get("color");
+
+                    double red = colorNode.get("red").doubleValue();
+                    double green = colorNode.get("green").doubleValue();
+                    double blue = colorNode.get("blue").doubleValue();
+                    double opacity = colorNode.get("opacity").doubleValue();
+
+                    Color color = new Color(red, green, blue, opacity);
+
+
+                    DataField dataField = new DataField(dataFieldName, dataFieldPosition);
+                    dataField.setOldName(dataFieldOldName);
+
+                    dataFields.add(dataField);
+
+                    DataFieldViewModel dataFieldViewModel = new DataFieldViewModel(dataField);
+                    dataFieldViewModel.setEnabled(enabled);
+                    dataFieldViewModel.setMax(max);
+                    dataFieldViewModel.setMin(min);
+                    dataFieldViewModel.setColor(color);
+                    dataFieldViewModels.add(dataFieldViewModel);
+                });
+
+                adapter.setFields(dataFields);
+                DataSource dataSource = new DataSource(connection, adapter);
+                dataSource.setName(dataSourceName);
+                dataSource.start();
+
+                DataSourceViewModel dataSourceViewModel = new DataSourceViewModel(dataSource, dataFieldViewModels);
+
+                viewModel.getRepository().addDataSourceViewModel(dataSourceViewModel);
+
+
+            });
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 
     public void initialize(){
@@ -167,6 +276,7 @@ public class MainView implements FxmlView<MainViewModel> {
         dataSetTree.setCellFactory(p -> new TextFieldTreeCellImpl());
 
         viewModel.getRepository().getDataSources().addListener((InvalidationListener) observable -> {
+
             root.getChildren().clear();
             viewModel.getRepository().getDataSources().forEach(d->{
                 TreeItem<DataSourceViewModel> treeItem = new TreeItem<>(d);
@@ -174,6 +284,26 @@ public class MainView implements FxmlView<MainViewModel> {
             });
         });
 
+        dataSetTree.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<DataSourceViewModel>>) c -> {
+           DataSourceViewModel selected = dataSetTree.getSelectionModel().getSelectedItem().getValue();
+            ViewTuple viewTuple = FluentViewLoader.javaView(DataSourceTableView.class).load();
+            DataSourceTableView view = (DataSourceTableView) viewTuple.getView();
+            view.init(selected);
+            dataFieldsPane.getChildren().clear();
+            dataFieldsPane.getChildren().add(view);
+        });
+
+    }
+
+    public void stop(){
+        System.out.println("Stop Main View");
+        if (chartView!=null) {
+            try {
+                chartView.stopPlotting();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setDefaultLogFileName(){

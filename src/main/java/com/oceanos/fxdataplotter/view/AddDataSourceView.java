@@ -1,5 +1,7 @@
 package com.oceanos.fxdataplotter.view;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.oceanos.fxdataplotter.connections.Connection;
 import com.oceanos.fxdataplotter.connections.ZeroMQConnection;
@@ -13,6 +15,7 @@ import com.oceanos.fxdataplotter.viewmodel.AddDataSourceViewModel;
 import com.oceanos.fxdataplotter.chartview.DataFieldViewModel;
 import com.oceanos.fxdataplotter.chartview.DataSourceViewModel;
 import de.saxsys.mvvmfx.FxmlView;
+import de.saxsys.mvvmfx.InjectViewModel;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.Optional;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 /**
@@ -39,9 +43,14 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
     private Connection connection;
     private DataAdapter dataAdapter;
     private ObservableList<DataFieldViewModel> dataFieldViewModels = FXCollections.observableArrayList();
+    private Preferences preferences;
 
     @Inject
     Repository repository;
+
+    @InjectViewModel
+    AddDataSourceViewModel viewModel;
+
     Stage stage;
 
 
@@ -89,7 +98,18 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
 
     @FXML
     void add(ActionEvent event) {
-        repository.addDataSourceViewModel(new DataSourceViewModel(dataSource, dataFieldViewModels));
+        DataSourceViewModel dataSourceViewModel = new DataSourceViewModel(dataSource, dataFieldViewModels);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataSourceViewModel));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+
+        repository.addDataSourceViewModel(dataSourceViewModel);
         dataSource.setName(nameField.getText());
         stage.close();
     }
@@ -133,6 +153,8 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
 
         if (connection != null && dataAdapter.isPresent()) {
             dataSource = new DataSource(connection, dataAdapter.get());
+            dataSource.init();
+            dataSource.start();
 
             dataFieldViewModels.addAll(dataSource
                     .getFields()
@@ -148,6 +170,14 @@ public class AddDataSourceView implements FxmlView<AddDataSourceViewModel> {
         zeroMQbtn.setUserData(ZeroMQConnection.class);
         jsonBtn.setUserData(JSONAdapter.class);
         csvBtn.setUserData(CSVAdapter.class);
+
+        preferences = Preferences.userRoot().node("fx_data_plotter");
+
+        addressField.setText(preferences.get(AddDataSourceViewModel.addresPrefName, ""));
+        topicField.setText(preferences.get(AddDataSourceViewModel.topicPrefName, ""));
+
+        addressField.textProperty().addListener((o,oV,nV)->preferences.put(AddDataSourceViewModel.addresPrefName, nV));
+        topicField.textProperty().addListener((o,oV,nV)->preferences.put(AddDataSourceViewModel.topicPrefName, nV));
 
         initTable();
     }

@@ -14,4 +14,5 @@ public interface DataAdapter {
     void init(String initData) throws DataParseException;
     List<DataField> getFields();
     Map<DataField,Double> getValues(String dataString) throws DataParseException;
+    void setFields(List<DataField> fields);
 }

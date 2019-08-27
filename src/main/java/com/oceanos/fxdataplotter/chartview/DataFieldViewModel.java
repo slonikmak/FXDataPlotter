@@ -20,6 +20,9 @@ public class DataFieldViewModel {
 
     public DataFieldViewModel(DataField dataField) {
         this.dataField = dataField;
+        this.position.setValue(dataField.getPosition());
+        this.name.setValue(dataField.getName());
+        this.name.addListener((o,oV,nV)->dataField.setName(nV));
     }
 
     public DataFieldViewModel(String name, int position, DataField dataField) {

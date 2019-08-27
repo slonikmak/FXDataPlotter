@@ -23,19 +23,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ChartView extends AnchorPane {
 
     //"Robo Data Chart"
     private final String chartName;
-    XYLineAndShapeRenderer renderer;
+    private XYLineAndShapeRenderer renderer;
 
     private Map<DataFieldViewModel, Integer> dataSourceMap = new HashMap<>();
 
-    ArrayList<ChartData> chartDataArrayList = new ArrayList<>();
-
+    private ArrayList<ChartData> chartDataArrayList = new ArrayList<>();
     private JFreeChart chart;
-    XYPlot plot;
+    private XYPlot plot;
+
+    private ScheduledExecutorService executorService;
 
     public ChartView(String name){
 
@@ -102,35 +107,33 @@ public class ChartView extends AnchorPane {
         return chartDataArrayList.size()-1;
     }
 
-    /*public void addDataSource(DataSourceItem dataSourceItem){
-        int index = addChartDataSeries(dataSourceItem.getName(), fxToAwtColor(dataSourceItem.getColor()), dataSourceItem.getMinValue(), dataSourceItem.getMaxValue());
-        dataSourceMap.put(index, dataSourceItem);
-    }*/
-
     public void addDataSource(DataSourceViewModel dataSourceViewModel){
         dataSourceViewModel.getDataFieldViewModels().stream().filter(DataFieldViewModel::isEnabled).forEach(f->{
             int index = addChartDataSeries(f.getName(), fxToAwtColor(f.getColor()),f.getMin(), f.getMax());
             dataSourceMap.put(f, index);
+            //System.out.println(f.getName()+ " "+ index);
         });
-        dataSourceViewModel.getLastDataProperty().addListener((o,oV,nV)->{
-            try {
-                Map<DataField, Double> values = dataSourceViewModel.getDataSource().getValues(nV);
-                dataSourceViewModel.getDataFieldViewModels().stream().filter(DataFieldViewModel::isEnabled).forEach(f->{
-                    int index = dataSourceMap.get(f);
-                    double val = values.get(f.getDataField());
-                    addDataToSeries(System.currentTimeMillis(), val, index);
-                });
-            } catch (DataParseException e) {
-                e.printStackTrace();
-            }
+
+    }
+
+    public void startPlotting(){
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleWithFixedDelay(this::update, 0, 50, TimeUnit.MILLISECONDS);
+    }
+
+    public void stopPlotting() throws InterruptedException {
+        executorService.shutdown();
+        executorService.awaitTermination(200, TimeUnit.MILLISECONDS);
+        executorService.shutdownNow();
+        System.out.println("Stop plotting!");
+    }
+
+    public void update(){
+        dataSourceMap.keySet().forEach(k->{
+            addDataToSeries(System.currentTimeMillis(), k.getCurrentValue(), dataSourceMap.get(k));
         });
     }
 
-    /*public void update(){
-        dataSourceMap.forEach((i,d)->{
-            addDataToSeries(System.currentTimeMillis(), d.getValue(), i);
-        });
-    }*/
 
     static Color fxToAwtColor(javafx.scene.paint.Color fx){
         return new Color((float) fx.getRed(),

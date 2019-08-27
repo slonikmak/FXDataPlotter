@@ -61,6 +61,7 @@ public class ZeroMQConnection implements Connection{
     private Runnable task = ()-> {
         try (ZContext context = new ZContext()){
             ZMQ.Socket sub = context.createSocket(SocketType.SUB);
+            System.out.println("address "+address +" topic "+topic);
             sub.connect(address);
             sub.subscribe(topic);
 

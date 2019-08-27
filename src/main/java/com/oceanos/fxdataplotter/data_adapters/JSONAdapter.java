@@ -53,4 +53,9 @@ public class JSONAdapter implements DataAdapter{
         }
         return valsMap;
     }
+
+    @Override
+    public void setFields(List<DataField> fields) {
+        this.fields = fields;
+    }
 }

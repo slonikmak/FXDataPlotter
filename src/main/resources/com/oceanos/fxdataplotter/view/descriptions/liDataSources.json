@@ -1,0 +1,56 @@
+[
+  {
+    "dataSource" : {
+      "name" : "Compass",
+      "sampleData" : "{\"heading\":0.24688794277655401,\"pitch\":1.2320965135243211,\"roll\":2.1957007190917577}",
+      "connection": {
+        "type": "zeroMQ",
+        "host": "192.168.10.102",
+        "port": 5567,
+        "topic": "device/compass"
+      },
+      "dataAdapter": "JSON"
+    },
+
+    "dataFieldViewModels" : [ {
+      "min" : 0,
+      "max" : 180,
+      "name" : "heading",
+      "oldName" : "heading",
+      "position" : 0,
+      "enabled" : false,
+      "color" : {
+        "red" : 1.0,
+        "green" : 0.5,
+        "blue" : 0.0,
+        "opacity" : 1.0
+      }
+    }, {
+      "min" : 0.0,
+      "max" : 1.0,
+      "name" : "val2",
+      "oldName" : "val2",
+      "position" : 1,
+      "enabled" : true,
+      "color" : {
+        "red" : 1.0,
+        "green" : 0.0,
+        "blue" : 0.0,
+        "opacity" : 1.0
+      }
+    }, {
+      "min" : 0.0,
+      "max" : 1.0,
+      "name" : "val3",
+      "oldName" : "val3",
+      "position" : 2,
+      "enabled" : true,
+      "color" : {
+        "red" : 1.0,
+        "green" : 0.5,
+        "blue" : 0.5,
+        "opacity" : 1.0
+      }
+    } ]
+  }
+]
