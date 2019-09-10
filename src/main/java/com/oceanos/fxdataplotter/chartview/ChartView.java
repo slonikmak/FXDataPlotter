@@ -80,7 +80,7 @@ public class ChartView extends AnchorPane {
             // но здесь по одной серии на каждый dataset
             XYLineAndShapeRenderer render = new XYLineAndShapeRenderer(true, false);
             render.setSeriesPaint(0, chartDataArrayList.get(i).paint);
-            render.setSeriesStroke(0, new BasicStroke(1));
+            render.setSeriesStroke(0, new BasicStroke(3));
             plot.setRenderer(i, render);
             // Цвет названия оси
             // Цвет значений градуировки

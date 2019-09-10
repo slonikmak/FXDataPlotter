@@ -26,20 +26,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -93,6 +94,18 @@ public class MainView implements FxmlView<MainViewModel> {
 
     @FXML
     private AnchorPane dataFieldsPane;
+
+    @FXML
+    private TextField timeRangeField;
+
+    @FXML
+    private ColorPicker linePicker;
+
+    @FXML
+    private void addLine(){
+        addLineNode();
+    }
+
 
     @FXML
     private void startLogging(ActionEvent event){
@@ -164,16 +177,21 @@ public class MainView implements FxmlView<MainViewModel> {
 
         viewModel.getRepository().getDataSources().forEach(d->chartView.addDataSource(d));
 
-        chartView.init(5000);
+        int timeRange = Integer.parseInt(timeRangeField.getText());
+
+        chartView.init(timeRange);
 
         chartPane.getChildren().clear();
         chartPane.getChildren().add(chartView);
+
         AnchorPane.setBottomAnchor(chartView, 0.);
         AnchorPane.setTopAnchor(chartView, 0.);
         AnchorPane.setLeftAnchor(chartView, 0.);
         AnchorPane.setRightAnchor(chartView, 0.);
 
         chartView.startPlotting();
+
+
     }
 
     @FXML
@@ -182,7 +200,7 @@ public class MainView implements FxmlView<MainViewModel> {
         //TODO: deep refactor
         ObjectMapper mapper = new ObjectMapper();
         try {
-            JsonNode root = mapper.readTree(getClass().getResource("/com/oceanos/fxdataplotter/view/descriptions/dataSource.json"));
+            JsonNode root = mapper.readTree(getClass().getResource("/com/oceanos/fxdataplotter/view/descriptions/liDataSources.json"));
             root.elements().forEachRemaining(dataSourceNodeElem-> {
 
                 JsonNode dataSourceNode = dataSourceNodeElem.get("dataSource");
@@ -263,7 +281,20 @@ public class MainView implements FxmlView<MainViewModel> {
         logFolderField.setText(appPreference.getString(MainViewModel.logFolderName));
         delimiterField.setText(appPreference.getString(MainViewModel.logHeaderDelimiter));
 
+
         initTreeView();
+
+        linePicker.setValue(Color.RED);
+    }
+
+    private void addLineNode(){
+        DraggableNode node = new DraggableNode();
+        node.setPrefHeight(2);
+        Color color = linePicker.getValue();
+        node.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
+        chartPane.getChildren().add(node);
+        AnchorPane.setLeftAnchor(node,0.);
+        AnchorPane.setRightAnchor(node, 0.);
     }
 
     private void initTreeView(){

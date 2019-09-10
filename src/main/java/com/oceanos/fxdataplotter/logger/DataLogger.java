@@ -31,6 +31,7 @@ public class DataLogger {
     private List<DataSource> dataSources;
     private BufferedWriter writer;
     private String delimiter;
+    private long startTime;
 
     public DataLogger(){
         executorService = Executors.newSingleThreadScheduledExecutor();
@@ -62,6 +63,7 @@ public class DataLogger {
 
         writeString(header);
 
+        startTime = System.currentTimeMillis();
         executorService.scheduleWithFixedDelay(saveTask, 0, 100, TimeUnit.MILLISECONDS);
 
 
@@ -78,8 +80,10 @@ public class DataLogger {
 
     private String getHeader(List<DataSource> dataSources, String delimiter){
         StringJoiner joiner = new StringJoiner(delimiter);
+        joiner.add("Time");
         dataSources.forEach(d->d.getFields().forEach(f->joiner.add(d.getName()+"_"+f.getName())));
-        return joiner.toString();
+        String result = joiner.toString();
+        return result;
     }
 
     private void writeString(String data) throws IOException {
@@ -87,8 +91,11 @@ public class DataLogger {
     }
 
     private Runnable saveTask = ()->{
+        long time = System.currentTimeMillis() - startTime;
         StringJoiner joiner = new StringJoiner(delimiter);
+        joiner.add(String.valueOf(time));
         dataSources.forEach(d->d.getFields().forEach(f->joiner.add(String.valueOf(f.getValue()))));
+
         try {
             writeString(joiner.toString());
         } catch (IOException e) {

@@ -1,8 +1,8 @@
 [
   {
-    "dataSource" : {
-      "name" : "Compass",
-      "sampleData" : "{\"heading\":0.24688794277655401,\"pitch\":1.2320965135243211,\"roll\":2.1957007190917577}",
+    "dataSource": {
+      "name": "Compass",
+      "sampleData": "{\"heading\":70.22,\"pitch\":-0.78,\"roll\":4.08}",
       "connection": {
         "type": "zeroMQ",
         "host": "192.168.10.102",
@@ -11,46 +11,277 @@
       },
       "dataAdapter": "JSON"
     },
-
-    "dataFieldViewModels" : [ {
-      "min" : 0,
-      "max" : 180,
-      "name" : "heading",
-      "oldName" : "heading",
-      "position" : 0,
-      "enabled" : false,
-      "color" : {
-        "red" : 1.0,
-        "green" : 0.5,
-        "blue" : 0.0,
-        "opacity" : 1.0
+    "dataFieldViewModels": [
+      {
+        "min": 0,
+        "max": 360,
+        "name": "heading",
+        "oldName": "heading",
+        "position": 0,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -20.0,
+        "max": 20.0,
+        "name": "pitch",
+        "oldName": "pitch",
+        "position": 1,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -20,
+        "max": 20,
+        "name": "roll",
+        "oldName": "roll",
+        "position": 2,
+        "enabled": false,
+        "color": {
+          "red": 0.6,
+          "green": 0.6,
+          "blue": 0.5,
+          "opacity": 1.0
+        }
       }
-    }, {
-      "min" : 0.0,
-      "max" : 1.0,
-      "name" : "val2",
-      "oldName" : "val2",
-      "position" : 1,
-      "enabled" : true,
-      "color" : {
-        "red" : 1.0,
-        "green" : 0.0,
-        "blue" : 0.0,
-        "opacity" : 1.0
+    ]
+  },
+  {
+    "dataSource": {
+      "name": "Manipulator",
+      "sampleData": "{\"degOne\":70.22,\"degTwo\":-0.78,\"degThree\":4.08}",
+      "connection": {
+        "type": "zeroMQ",
+        "host": "192.168.10.102",
+        "port": 5567,
+        "topic": "device/manip"
+      },
+      "dataAdapter": "JSON"
+    },
+    "dataFieldViewModels": [
+      {
+        "min": -90.0,
+        "max": 90.0,
+        "name": "degOne",
+        "oldName": "degOne",
+        "position": 0,
+        "enabled": false,
+        "color": {
+          "red": 0.8,
+          "green": 0.8,
+          "blue": 0.2,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -90.0,
+        "max": 90.0,
+        "name": "degTwo",
+        "oldName": "degTwo",
+        "position": 1,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.5,
+          "blue": 0.5,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -90.0,
+        "max": 90.0,
+        "name": "degThree",
+        "oldName": "degThree",
+        "position": 2,
+        "enabled": false,
+        "color": {
+          "red": 0.6,
+          "green": 0.9,
+          "blue": 0.9,
+          "opacity": 1.0
+        }
       }
-    }, {
-      "min" : 0.0,
-      "max" : 1.0,
-      "name" : "val3",
-      "oldName" : "val3",
-      "position" : 2,
-      "enabled" : true,
-      "color" : {
-        "red" : 1.0,
-        "green" : 0.5,
-        "blue" : 0.5,
-        "opacity" : 1.0
+    ]
+  },
+  {
+    "dataSource": {
+      "name": "Depth",
+      "sampleData": "{\"depth\":4.08}",
+      "connection": {
+        "type": "zeroMQ",
+        "host": "192.168.10.102",
+        "port": 5567,
+        "topic": "device/depth"
+      },
+      "dataAdapter": "JSON"
+    },
+    "dataFieldViewModels": [
+      {
+        "min": -0.2,
+        "max": 2.0,
+        "name": "depth",
+        "oldName": "depth",
+        "position": 0,
+        "enabled": true,
+        "color": {
+          "red": 0.2,
+          "green": 0.8,
+          "blue": 0.8,
+          "opacity": 1.0
+        }
       }
-    } ]
+    ]
+  },
+  {
+    "dataSource": {
+      "name": "Motors",
+      "sampleData": "{\"left\":70.22,\"right\":-0.78,\"top_rear\":4.08,\"top_forvard\":4.08,\"lag_rear\":4.08,\"lag_forvard\":4.08}",
+      "connection": {
+        "type": "zeroMQ",
+        "host": "192.168.10.102",
+        "port": 5567,
+        "topic": "motors/generic_data"
+      },
+      "dataAdapter": "JSON"
+    },
+    "dataFieldViewModels": [
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "left",
+        "oldName": "left",
+        "position": 0,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "right",
+        "oldName": "right",
+        "position": 1,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "top_rear",
+        "oldName": "top_rear",
+        "position": 2,
+        "enabled": false,
+        "color": {
+          "red": 0.1,
+          "green": 0.9,
+          "blue": 0.5,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "top_forvard",
+        "oldName": "top_forvard",
+        "position": 3,
+        "enabled": false,
+        "color": {
+          "red": 0.0,
+          "green": 0.8,
+          "blue": 0.9,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "lag_rear",
+        "oldName": "lag_rear",
+        "position": 4,
+        "enabled": false,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -100.0,
+        "max": 100.0,
+        "name": "lag_forvard",
+        "oldName": "lag_forvard",
+        "position": 5,
+        "enabled": false,
+        "color": {
+          "red": 0.6,
+          "green": 0.6,
+          "blue": 0.5,
+          "opacity": 1.0
+        }
+      }
+    ]
+  },
+  {
+    "dataSource": {
+      "name": "Target Values",
+      "sampleData": "{\"targetDepth\":0,\"targetPitch\":0}",
+      "connection": {
+        "type": "zeroMQ",
+        "host": "192.168.10.102",
+        "port": 5567,
+        "topic": "target/values"
+      },
+      "dataAdapter": "JSON"
+    },
+    "dataFieldViewModels": [
+      {
+        "min": -0.2,
+        "max": 2,
+        "name": "targetDepth",
+        "oldName": "targetDepth",
+        "position": 0,
+        "enabled": true,
+        "color": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 1.0,
+          "opacity": 1.0
+        }
+      },
+      {
+        "min": -20.0,
+        "max": 20.0,
+        "name": "targetPitch",
+        "oldName": "targetPitch",
+        "position": 1,
+        "enabled": true,
+        "color": {
+          "red": 1.0,
+          "green": 0.0,
+          "blue": 0.0,
+          "opacity": 1.0
+        }
+      }
+    ]
   }
 ]
